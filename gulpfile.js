@@ -1,10 +1,10 @@
 /*
  * Created by Trevor Sears <trevor@trevorsears.com> (https://trevorsears.com/).
  * 8:48 PM -- June 16th, 2019.
- * Project: <name>
+ * Project: @t99/spotify
  * 
- * <name> - <desc>
- * Copyright (C) 2021 Trevor Sears
+ * @t99/spotify - A TypeScript/JavaScript library for accessing the Spotify API.
+ * Copyright (C) 2022 Trevor Sears
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
