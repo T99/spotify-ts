@@ -21,6 +21,7 @@
  */
 
 import { SpotifyAPI } from "./spotify-api";
+import { Credentials, getCredentials } from "./credentials";
 
 /**
  * NPM main class used for exporting this package's contents.
@@ -32,14 +33,15 @@ import { SpotifyAPI } from "./spotify-api";
 
 // export { ClassName } from "./class-location";
 
+const TUESDAY_TALKS_SHOW_ID: string = "5aEsPtN61qhf1mxTrrcgOt";
+
 export async function main(): Promise<void> {
 	
-	let api: SpotifyAPI = await SpotifyAPI.createWithClientInfo(
-		"5d34ac821e4a438391f309c37a529b90",
-		"a6b0bc3347444d1eab1e4dd4c25d2af9"
-	);
+	let credentials: Credentials = await getCredentials();
 	
-	api;
+	let api: SpotifyAPI = await SpotifyAPI.createWithClientInfo(credentials.clientId, credentials.clientSecret);
+	
+	console.log(JSON.stringify(await api.getShow(TUESDAY_TALKS_SHOW_ID, "US")));
 	
 }
 
