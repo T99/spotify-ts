@@ -7,7 +7,9 @@
 import { request, RequestResponse } from "./request";
 
 export class SpotifyAPI {
-
+	
+	public static readonly BASE_API_URL: string = "https://api.spotify.com/";
+	
 	protected accessToken: string;
 	
 	protected constructor(accessToken: string) {
@@ -21,8 +23,6 @@ export class SpotifyAPI {
 		let authHeaderValue: string = Buffer.from(`${clientID}:${clientSecret}`).toString("base64");
 		let formData: URLSearchParams = new URLSearchParams();
 		
-		console.log(authHeaderValue);
-		
 		formData.append("grant_type", "client_credentials");
 		
 		let response: RequestResponse = await request("https://accounts.spotify.com/api/token", {
@@ -33,11 +33,8 @@ export class SpotifyAPI {
 			},
 		}, formData.toString());
 		
-		if (response.status === 200) 
-		
-		console.log(response);
-		
-		return undefined as any;
+		if (response.status === 200) return new SpotifyAPI(response.body.access_token);
+		else throw new Error(`Failed to initialize a connection with the Spotify API. Response body: ${response.body}`);
 		
 	}
 	
