@@ -4,3 +4,4 @@ js/
 node_modules/
 ts/tests/coverage
 package-lock.json
+credentials.json
