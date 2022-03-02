@@ -14,14 +14,14 @@ export type RequestResponse = {
 		[header: string]: string | string[] | undefined
 	},
 	body: any
-}
+};
 
 export function request(url: string | URL, options: RequestOptions, body?: string): Promise<RequestResponse> {
 	
 	return new Promise<RequestResponse>((resolve: (value: RequestResponse) => void,
 											  reject: (reason?: Error) => void): void => {
 		
-		let request: http.ClientRequest = https.request(url, options, (response: http.IncomingMessage): void => {
+		let clientRequest: http.ClientRequest = https.request(url, options, (response: http.IncomingMessage): void => {
 				
 			let rawBody: string = "";
 			
@@ -29,22 +29,22 @@ export function request(url: string | URL, options: RequestOptions, body?: strin
 			
 			response.on("end", (): void => {
 				
-				let body: any;
+				let responseBody: any;
 				
 				try {
 					
-					body = JSON.parse(rawBody);
+					responseBody = JSON.parse(rawBody);
 					
 				} catch (error: any) {
 					
-					body = rawBody;
+					responseBody = rawBody;
 					
 				}
 				
 				resolve({
 					status: response.statusCode as number,
 					headers: response.headers,
-					body
+					body: responseBody
 				});
 				
 			});
@@ -53,9 +53,9 @@ export function request(url: string | URL, options: RequestOptions, body?: strin
 			
 		});
 		
-		if (body) request.write(body);
+		if (body) clientRequest.write(body);
 		
-		request.end();
+		clientRequest.end();
 		
 	});
 	
