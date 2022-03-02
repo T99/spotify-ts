@@ -5,6 +5,7 @@
  */
 
 import { request, RequestResponse } from "./request";
+import { Show } from "./schema/show";
 
 export class SpotifyAPI {
 	
@@ -41,6 +42,49 @@ export class SpotifyAPI {
 	public static createWithAccessToken(accessToken: string): SpotifyAPI {
 		
 		return new SpotifyAPI(accessToken);
+		
+	}
+	
+	protected getAuthorizationHeaderValue(): string {
+		
+		return `Bearer ${this.accessToken}`;
+		
+	}
+	
+	protected getBaseRequestHeaders(): object {
+		
+		return {
+			"Authorization": this.getAuthorizationHeaderValue(),
+			"Content-Type": "application/json"
+		};
+		
+	}
+	
+	/**
+	 * Get Spotify catalog information for a single show identified by its unique Spotify ID.
+	 * 
+	 * @param {string} showID The
+	 * <a href="https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids">Spotify ID</a> for the show.
+	 * @param {string} market An ISO 3166-1 alpha-2 country code. If a country code is specified, only content that is
+	 * available in that market will be returned. If a valid user access token is specified in the request header, the
+	 * country associated with the user account will take priority over this parameter.
+	 * @returns {Promise<Show>} A Spotify {@link Show} object.
+	 */
+	public async getShow(showID: string, market?: string): Promise<Show> {
+		
+		let url: URL = new URL(`/v1/shows/${showID}`, SpotifyAPI.BASE_API_URL);
+		
+		if (market) url.searchParams.append("market", market);
+		
+		let response: RequestResponse = await request(url, {
+			method: "GET",
+			headers: {
+				...this.getBaseRequestHeaders()
+			}
+		});
+		
+		if (response.status === 200) return response.body as Show;
+		else throw new Error(`Failed to fetch Show information from the Spotify API. Error/response body: ${response.body}`);
 		
 	}
 	
