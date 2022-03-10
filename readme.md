@@ -68,9 +68,18 @@ Currently, that documentation can be found here:
 [Spotify Web API](https://developer.spotify.com/documentation/web-api/reference)
 
 For each endpoint listed within the reference documentation linked above, a matching method should be available on
-`SpotifyAPI` instances. The name of the method should be the camelCase version of the given name of the endpoint. For
-example, the "Get Artist's Related Artists" endpoint can be accessed via the `SpotifyAPI#getArtistsRelatedArtists`
+`SpotifyAPI` instances. The name of the method should be the camelCase version of the given name of the endpoint. 
+
+For example, the "Get Artist's Related Artists" endpoint can be accessed via the `SpotifyAPI#getArtistsRelatedArtists`
 method.
+
+There are a few notable exceptions to this rule due to a small number of overlapping names for different endpoints
+within the Spotify Web API documentation. These include:
+
+ - `GET /audio-features` (Documentation name: "Get Track's Audio Features")
+   - The method name for this endpoint is: `SpotifyAPI#getTracksAudioFeatures`.
+ - `GET /audio-features/{id}` (Documentation name: "Get Track's Audio Features")
+   - The method name for this endpoint is: `SpotifyAPI#getSeveralTracksAudioFeatures`.
 
 ## License
 
