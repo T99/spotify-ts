@@ -1,7 +1,7 @@
 /*
  * Created by Trevor Sears <trevor@trevorsears.com> (https://trevorsears.com/).
  * 10:25 AM -- March 8th, 2022
- * Project: spotify-api
+ * Project: @t99/spotify
  */
 
 export interface SpotifyPagination<T> {

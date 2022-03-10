@@ -1,7 +1,7 @@
 /*
  * Created by Trevor Sears <trevor@trevorsears.com> (https://trevorsears.com/).
  * 2:27 PM -- February 25th, 2022
- * Project: spotify-api
+ * Project: @t99/spotify
  */
 
 import { request, RequestResponse } from "./request";

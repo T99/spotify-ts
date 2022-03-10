@@ -1,7 +1,7 @@
 /*
  * Created by Trevor Sears <trevor@trevorsears.com> (https://trevorsears.com/).
  * 9:20 AM -- March 8th, 2022
- * Project: spotify-api
+ * Project: @t99/spotify
  */
 
 import { SpotifyBaseObject } from "./spotify-base-object";
