@@ -4,6 +4,7 @@
  * Project: @t99/spotify
  */
 
+import util from "util";
 import { request, RequestResponse } from "./request";
 import { SpotifyShow } from "./schema/spotify-show";
 import { SpotifyPagination } from "./schema/spotify-pagination";
@@ -11,6 +12,11 @@ import { SpotifyAlbum } from "./schema/spotify-album";
 import { SpotifySingleKeyObject } from "./schema/spotify-single-key-object";
 import { SpotifyTrack } from "./schema/spotify-track";
 import { SpotifyArtist } from "./schema/spotify-artist";
+import { SpotifyEpisode } from "./schema/spotify-episode";
+import { SpotifyAudioFeatures } from "./schema/spotify-audio-features";
+import { SpotifyAudioAnalysis } from "./schema/spotify-audio-analysis";
+import { SpotifyRecommendations } from "./schema/spotify-recommendations";
+import { SpotifySearchResults } from "./schema/spotify-search-results";
 
 export type MarketSpecifier = {
 	
@@ -45,16 +51,20 @@ export type CountrySpecifier = {
 	
 };
 
-export type PaginationSpecifier = {
+export type LimitSpecifier = {
 	
 	/**
 	 * The maximum number of items to return.
-	 * 
+	 *
 	 * Default: 20
 	 * Minimum: 1
 	 * Maximum: 50
 	 */
 	limit?: number;
+	
+};
+
+export type PaginationSpecifier = LimitSpecifier & {
 	
 	/**
 	 * The index of the first item to return. Use with limit to get the next set of items.
@@ -80,6 +90,61 @@ export type AlbumGroupsSpecifier = {
 	 * Example value: "single,appears_on"
 	 */
 	include_groups?: string;
+	
+};
+
+export type RecommendationsSpecifier = {
+	
+	// TODO [3/10/2022 @ 1:10 PM] Compile the recommendations specifier type from the documentation.
+	
+};
+
+export type SearchSpecifier = {
+	
+	/**
+	 * Your search query.
+	 *
+	 * You can narrow down your search using field filters. The available filters are album, artist, track, year, upc,
+	 * tag:hipster, tag:new, isrc, and genre. Each field filter only applies to certain result types.
+	 *
+	 * - The artist filter can be used while searching albums, artists or tracks.
+	 * - The album and year filters can be used while searching albums or tracks. You can filter on a single year or a
+	 *   range (e.g. 1955-1960).
+	 * - The genre filter can be use while searching tracks and artists.
+	 * - The isrc and track filters can be used while searching tracks.
+	 * - The upc, tag:new and tag:hipster filters can only be used while searching albums. The tag:new filter will
+	 *   return albums released in the past two weeks and tag:hipster can be used to return only albums with the lowest
+	 *   10% popularity.
+	 *
+	 * You can also use the NOT operator to exclude keywords from your search.
+	 * 
+	 * Example value: "remaster%20track:Doxy+artist:Miles%20Davis"
+	 */
+	q?: string;
+	
+	/**
+	 * A comma-separated list of item types to search across. Search results include hits from all the specified item
+	 * types. For example: q=name:abacab&type=album,track returns both albums and tracks with "abacab" included in their
+	 * name.
+	 * 
+	 * Allowed values:
+	 *  - "album"
+	 *  - "artist"
+	 *  - "playlist"
+	 *  - "track"
+	 *  - "show"
+	 *  - "episode"
+	 *  
+	 *  Example value: "track,artist"
+	 */
+	type?: string;
+	
+	/**
+	 * If include_external=audio is specified it signals that the client can play externally hosted audio content, and
+	 * marks the content as playable in the response. By default externally hosted audio content is marked as unplayable
+	 * in the response.
+	 */
+	include_external?: "audio";
 	
 };
 
@@ -132,7 +197,7 @@ export class SpotifyAPI {
 	
 	protected async query<T>(method: string, endpoint: string, parameters: { [param: string]: any } = {}): Promise<T> {
 		
-		let url: URL = new URL(endpoint, SpotifyAPI.BASE_API_URL);
+		let url: URL = new URL(`/v1${endpoint}`, SpotifyAPI.BASE_API_URL);
 		
 		for (let key of Object.keys(parameters)) {
 			
@@ -148,7 +213,7 @@ export class SpotifyAPI {
 		});
 		
 		if (response.status === 200) return response.body as T;
-		else throw new Error(`Failed to query the Spotify API. Error/response body: ${response.body}`);
+		else throw new Error(`Failed to query the Spotify API. Error/response body: ${util.inspect(response.body, false, null, true)}`);
 		
 	}
 	
@@ -347,7 +412,7 @@ export class SpotifyAPI {
 	 */
 	public getShow(showID: string, options: MarketSpecifier = {}): Promise<SpotifyShow> {
 		
-		return this.query("GET", `/v1/shows/${showID}`, options);
+		return this.query("GET", `/shows/${showID}`, options);
 		
 	}
 	
@@ -423,9 +488,102 @@ export class SpotifyAPI {
 	
 	// ===== EPISODE ENDPOINTS =====
 	
+	public getEpisode(episodeID: string, options: MarketSpecifier = {}): Promise<SpotifyEpisode> {
+		
+		return this.query("GET", `/episodes/${episodeID}`, options);
+		
+	}
+	
+	public getSeveralEpisodes(episodeIDs: string[], options: MarketSpecifier = {}):
+		Promise<SpotifySingleKeyObject<"episodes", SpotifyEpisode[]>> {
+		
+		return this.query("GET", `/episodes`, { ids: episodeIDs, ...options });
+		
+	}
+	
+	public getUsersSavedEpisodes(options: MarketSpecifier & PaginationSpecifier = {}):
+		Promise<SpotifyPagination<SpotifyEpisode>> {
+		
+		return this.query("GET", `/me/episodes`, options);
+		
+	}
+	
+	// TODO [3/10/2022 @ 12:01 PM] - Endpoint: 'Save Episodes for User'
+	
+	// TODO [3/10/2022 @ 12:01 PM] - Endpoint: 'Remove User's Saved Episodes'
+	
+	public checkUsersSavedEpisodes(episodeIDs: string[]): Promise<boolean[]> {
+		
+		return this.query("GET", `/me/episodes/contains`, { ids: episodeIDs });
+		
+	}
+	
 	// ===== TRACK ENDPOINTS =====
 	
+	public getTrack(trackID: string, options: MarketSpecifier = {}): Promise<SpotifyTrack> {
+		
+		return this.query("GET", `/tracks/${trackID}`, options);
+		
+	}
+	
+	public getSeveralTracks(trackIDs: string[], options: MarketSpecifier = {}):
+		Promise<SpotifySingleKeyObject<"tracks", SpotifyTrack[]>> {
+		
+		return this.query("GET", `/tracks`, options);
+		
+	}
+	
+	public getUsersSavedTracks(options: MarketSpecifier & PaginationSpecifier = {}):
+		Promise<SpotifyPagination<SpotifyTrack>> {
+		
+		return this.query("GET", `/me/tracks`, options);
+		
+	}
+	
+	// TODO [3/10/2022 @ 12:06 PM] - Endpoint: 'Save Tracks for Current User'
+	
+	// TODO [3/10/2022 @ 12:06 PM] - Endpoint: 'Remove Tracks for Current User'
+	
+	public checkUsersSavedTracks(trackIDs: string[]): Promise<boolean[]> {
+		
+		return this.query("GET", `/me/tracks/contains`, { ids: trackIDs });
+		
+	}
+	
+	public getSeveralTracksAudioFeatures(trackIDs: string[]):
+		Promise<SpotifySingleKeyObject<"audio_features", SpotifyAudioFeatures[]>> {
+		
+		return this.query("GET", `/audio-features`, { ids: trackIDs });
+		
+	}
+	
+	public getTracksAudioFeatures(trackID: string): Promise<SpotifyAudioFeatures> {
+		
+		return this.query("GET", `/audio-features/${trackID}`);
+		
+	}
+	
+	public getTracksAudioAnalysis(trackID: string): Promise<SpotifyAudioAnalysis> {
+		
+		return this.query("GET", `/audio-analysis/${trackID}`);
+		
+	}
+	
+	public getRecommendations(options: MarketSpecifier & LimitSpecifier & RecommendationsSpecifier = {}):
+		Promise<SpotifyRecommendations> {
+		
+		return this.query("GET", `/recommendations`, options);
+		
+	}
+	
 	// ===== SEARCH ENDPOINTS =====
+	
+	public searchForItem(options: MarketSpecifier & PaginationSpecifier & SearchSpecifier = {}):
+		Promise<SpotifySearchResults> {
+		
+		return this.query("GET", `/search`, options);
+		
+	}
 	
 	// ===== USER ENDPOINTS =====
 	
@@ -437,6 +595,18 @@ export class SpotifyAPI {
 	
 	// ===== PLAYER ENDPOINTS =====
 	
+	public pausePlayback(deviceID?: string): Promise<void> {
+		
+		return this.query("PUT", `/me/player/pause`, { device_id: deviceID });
+		
+	}
+	
 	// ===== MARKET ENDPOINTS =====
+	
+	public getAvailableMarkets(): Promise<SpotifySingleKeyObject<"markets", string[]>> {
+		
+		return this.query("GET", `/markets`);
+		
+	}
 	
 }
