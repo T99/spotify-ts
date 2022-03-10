@@ -9,7 +9,7 @@ import { SpotifyArtist } from "./spotify-artist";
 import { SpotifyAlbum } from "./spotify-album";
 
 /**
- * The object format for an track, as provided by the Spotify API.
+ * The object format for a track, as provided by the Spotify API.
  * 
  * @author Trevor Sears <trevor@trevorsears.com> (https://trevorsears.com/)
  * @version v0.1.0
