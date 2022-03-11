@@ -57,6 +57,21 @@ export class SpotifyAPI {
 		
 	}
 	
+	public static async createWithLogin(clientID: string, redirectURI: string, scopes: SpotifyScope[]): Promise<any> {
+		
+		let authorizationURL: URL = new URL("https://accounts.spotify.com/authorize");
+		let state: string = "rand16charstring";
+		
+		authorizationURL.searchParams.append("response_type", "code");
+		authorizationURL.searchParams.append("client_id", clientID);
+		authorizationURL.searchParams.append("scope", scopes.join(" "));
+		authorizationURL.searchParams.append("redirect_uri", redirectURI);
+		authorizationURL.searchParams.append("state", state);
+		
+		console.log(authorizationURL.href);
+		
+	}
+	
 	protected getAuthorizationHeaderValue(): string {
 		
 		return `Bearer ${this.accessToken}`;
