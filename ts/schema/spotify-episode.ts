@@ -4,10 +4,10 @@
  * Project: @t99/spotify
  */
 
-import { SpotifyBaseObject } from "./spotify-base-object";
 import { SpotifyShow } from "./spotify-show";
+import { SpotifyBaseAudioObject } from "./spotify-base-audio-object";
 
-export interface SpotifyEpisode extends SpotifyBaseObject {
+export interface SpotifyEpisode extends SpotifyBaseAudioObject {
 	
 	"audio_preview_url": "https://p.scdn.co/mp3-preview/2f37da1d4221f40b9d1a98cd191f4d6f1646ad17",
 	

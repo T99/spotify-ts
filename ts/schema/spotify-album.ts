@@ -4,12 +4,12 @@
  * Project: @t99/spotify
  */
 
-import { SpotifyBaseObject } from "./spotify-base-object";
 import { SpotifyArtist } from "./spotify-artist";
 import { SpotifyPagination } from "./spotify-pagination";
 import { SpotifyTrack } from "./spotify-track";
+import { SpotifyBaseAudioObject } from "./spotify-base-audio-object";
 
-export interface SpotifyAlbum extends SpotifyBaseObject {
+export interface SpotifyAlbum extends SpotifyBaseAudioObject {
 	
 	readonly type: "album";
 	

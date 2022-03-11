@@ -4,12 +4,12 @@
  * Project: @t99/spotify
  */
 
-import { SpotifyBaseObject } from "./spotify-base-object";
 import { SpotifyPagination } from "./spotify-pagination";
 import { SpotifyEpisode } from "./spotify-episode";
 import { SpotifyCopyright } from "./spotify-copyright";
+import { SpotifyBaseAudioObject } from "./spotify-base-audio-object";
 
-export interface SpotifyShow extends SpotifyBaseObject {
+export interface SpotifyShow extends SpotifyBaseAudioObject {
 	
 	/**
 	 * A description of the show. HTML tags are stripped away from this field, use html_description field in case HTML

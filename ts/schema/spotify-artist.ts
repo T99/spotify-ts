@@ -4,7 +4,7 @@
  * Project: @t99/spotify
  */
 
-import { SpotifyBaseObject } from "./spotify-base-object";
+import { SpotifyBaseAudioObject } from "./spotify-base-audio-object";
 
 /**
  * The object format for an artist, as provided by the Spotify API.
@@ -13,7 +13,7 @@ import { SpotifyBaseObject } from "./spotify-base-object";
  * @version v0.1.0
  * @since v0.1.0
  */
-export interface SpotifyArtist extends SpotifyBaseObject {
+export interface SpotifyArtist extends SpotifyBaseAudioObject {
 	
 	readonly type: "artist";
 	
