@@ -20,16 +20,17 @@
 	},
 	"homepage": "https://github.com/T99/spotify-ts#readme",
 	"devDependencies": {
-		"typescript": "latest",
-		"tslint": "latest",
 		"@types/jest": "latest",
+		"@types/node": "^17.0.21",
 		"del": "latest",
 		"gulp": "latest",
 		"gulp-sourcemaps": "latest",
 		"gulp-typescript": "latest",
 		"gulp-uglify-es": "latest",
 		"jest": "latest",
-		"ts-jest": "latest"
+		"ts-jest": "latest",
+		"tslint": "latest",
+		"typescript": "latest"
 	},
 	"dependencies": {}
 }
