@@ -488,12 +488,33 @@ export class SpotifyAPI {
 	
 	// ===== EPISODE ENDPOINTS =====
 	
+	/**
+	 * Get Spotify catalog information for a single episode identified by its unique Spotify ID.
+	 * 
+	 * @param {string} episodeID The
+	 * <a href="https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids">Spotify ID</a> for the
+	 * episode.
+	 * @param {MarketSpecifier} options Optional parameters for this endpoint. See the documentation for the individual
+	 * parameter types for more information.
+	 * @returns {Promise<SpotifyEpisode>} A Promise that resolves to Spotify catalog information for a single episode.
+	 */
 	public getEpisode(episodeID: string, options: MarketSpecifier = {}): Promise<SpotifyEpisode> {
 		
 		return this.query("GET", `/episodes/${episodeID}`, options);
 		
 	}
 	
+	/**
+	 * Get Spotify catalog information for several episodes based on their Spotify IDs.
+	 * 
+	 * @param {string[]} episodeIDs A comma-separated list of the
+	 * <a href="https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids">Spotify IDs</a> for the
+	 * episodes. Maximum: 50 IDs.
+	 * @param {MarketSpecifier} options Optional parameters for this endpoint. See the documentation for the individual
+	 * parameter types for more information.
+	 * @returns {Promise<SpotifySingleKeyObject<"episodes", SpotifyEpisode[]>>} A Promise that resolves to Spotify
+	 * catalog information for several episodes.
+	 */
 	public getSeveralEpisodes(episodeIDs: string[], options: MarketSpecifier = {}):
 		Promise<SpotifySingleKeyObject<"episodes", SpotifyEpisode[]>> {
 		
@@ -501,6 +522,19 @@ export class SpotifyAPI {
 		
 	}
 	
+	/**
+	 * Get a list of the episodes saved in the current Spotify user's library.
+	 * 
+	 * This API endpoint is in beta and could change without warning. Please share any feedback that you have, or issues
+	 * that you discover, in our
+	 * <a href="https://community.spotify.com/t5/Spotify-for-Developers/bd-p/Spotify_Developer">developer community
+	 * forum.</a>
+	 * 
+	 * @param {MarketSpecifier & PaginationSpecifier} options Optional parameters for this endpoint. See the
+	 * documentation for the individual parameter types for more information.
+	 * @returns {Promise<SpotifyPagination<SpotifyEpisode>>} A Promise that resolves to a list of the episodes saved in
+	 * the current Spotify user's library.
+	 */
 	public getUsersSavedEpisodes(options: MarketSpecifier & PaginationSpecifier = {}):
 		Promise<SpotifyPagination<SpotifyEpisode>> {
 		
@@ -512,6 +546,21 @@ export class SpotifyAPI {
 	
 	// TODO [3/10/2022 @ 12:01 PM] - Endpoint: 'Remove User's Saved Episodes'
 	
+	/**
+	 * Check if one or more episodes is already saved in the current Spotify user's 'Your Episodes' library.
+	 * 
+	 * This API endpoint is in beta and could change without warning. Please share any feedback that you have, or issues
+	 * that you discover, in our
+	 * <a href="https://community.spotify.com/t5/Spotify-for-Developers/bd-p/Spotify_Developer">developer community
+	 * forum.</a>
+	 * 
+	 * @param {string[]} episodeIDs A comma-separated list of the
+	 * <a href="https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids">Spotify IDs</a> for the
+	 * episodes. Maximum: 50 IDs.
+	 * @returns {Promise<boolean[]>} A Promise that resolves to an array of booleans that each respectively match back
+	 * the list provided input array of episode IDs to indicate whether or not the episode with that episode ID is
+	 * already saved in the current Spotify user's 'Your Episodes' library.
+	 */
 	public checkUsersSavedEpisodes(episodeIDs: string[]): Promise<boolean[]> {
 		
 		return this.query("GET", `/me/episodes/contains`, { ids: episodeIDs });
@@ -520,12 +569,33 @@ export class SpotifyAPI {
 	
 	// ===== TRACK ENDPOINTS =====
 	
+	/**
+	 * Get Spotify catalog information for a single track identified by its unique Spotify ID.
+	 * 
+	 * @param {string} trackID The
+	 * <a href="https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids">Spotify ID</a> for the
+	 * track.
+	 * @param {MarketSpecifier} options Optional parameters for this endpoint. See the documentation for the individual
+	 * parameter types for more information.
+	 * @returns {Promise<SpotifyTrack>} A Promise that resolves to Spotify catalog information for a single track.
+	 */
 	public getTrack(trackID: string, options: MarketSpecifier = {}): Promise<SpotifyTrack> {
 		
 		return this.query("GET", `/tracks/${trackID}`, options);
 		
 	}
 	
+	/**
+	 * Get Spotify catalog information for multiple tracks based on their Spotify IDs.
+	 * 
+	 * @param {string[]} trackIDs A comma-separated list of the
+	 * <a href="https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids">Spotify IDs</a> for the
+	 * tracks. Maximum: 50 IDs.
+	 * @param {MarketSpecifier} options Optional parameters for this endpoint. See the documentation for the individual
+	 * parameter types for more information.
+	 * @returns {Promise<SpotifySingleKeyObject<"tracks", SpotifyTrack[]>>} A Promise that resolves to Spotify catalog
+	 * information for multiple tracks.
+	 */
 	public getSeveralTracks(trackIDs: string[], options: MarketSpecifier = {}):
 		Promise<SpotifySingleKeyObject<"tracks", SpotifyTrack[]>> {
 		
@@ -533,6 +603,14 @@ export class SpotifyAPI {
 		
 	}
 	
+	/**
+	 * Get a list of the songs saved in the current Spotify user's 'Your Music' library.
+	 * 
+	 * @param {MarketSpecifier & PaginationSpecifier} options Optional parameters for this endpoint. See the
+	 * documentation for the individual parameter types for more information.
+	 * @returns {Promise<SpotifyPagination<SpotifyTrack>>} A Promise that resolves to a list of the songs saved in the
+	 * current Spotify user's 'Your Music' library.
+	 */
 	public getUsersSavedTracks(options: MarketSpecifier & PaginationSpecifier = {}):
 		Promise<SpotifyPagination<SpotifyTrack>> {
 		
@@ -544,12 +622,31 @@ export class SpotifyAPI {
 	
 	// TODO [3/10/2022 @ 12:06 PM] - Endpoint: 'Remove Tracks for Current User'
 	
+	/**
+	 * Check if one or more tracks is already saved in the current Spotify user's 'Your Music' library.
+	 * 
+	 * @param {string[]} trackIDs A comma-separated list of the
+	 * <a href="https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids">Spotify IDs</a> for the
+	 * tracks. Maximum: 50 IDs.
+	 * @returns {Promise<boolean[]>} A Promise that resolves to an array of booleans that each respectively match back
+	 * the list provided input array of track IDs to indicate whether or not the track with that track ID is already
+	 * saved in the current Spotify user's 'Your Music' library.
+	 */
 	public checkUsersSavedTracks(trackIDs: string[]): Promise<boolean[]> {
 		
 		return this.query("GET", `/me/tracks/contains`, { ids: trackIDs });
 		
 	}
 	
+	/**
+	 * Get audio features for multiple tracks based on their Spotify IDs.
+	 * 
+	 * @param {string[]} trackIDs A comma-separated list of the
+	 * <a href="https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids">Spotify IDs</a> for the
+	 * tracks. Maximum: 100 IDs.
+	 * @returns {Promise<SpotifySingleKeyObject<"audio_features", SpotifyAudioFeatures[]>>} A Promise that resolves to
+	 * audio features for multiple tracks.
+	 */
 	public getSeveralTracksAudioFeatures(trackIDs: string[]):
 		Promise<SpotifySingleKeyObject<"audio_features", SpotifyAudioFeatures[]>> {
 		
@@ -557,18 +654,48 @@ export class SpotifyAPI {
 		
 	}
 	
+	/**
+	 * Get audio feature information for a single track identified by its unique Spotify ID.
+	 * 
+	 * @param {string} trackID The
+	 * <a href="https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids">Spotify ID</a> for the
+	 * track.
+	 * @returns {Promise<SpotifyAudioFeatures>} A Promise that resolves to audio feature information for a single track.
+	 */
 	public getTracksAudioFeatures(trackID: string): Promise<SpotifyAudioFeatures> {
 		
 		return this.query("GET", `/audio-features/${trackID}`);
 		
 	}
 	
+	/**
+	 * Get a low-level audio analysis for a track in the Spotify catalog. The audio analysis describes the track’s
+	 * structure and musical content, including rhythm, pitch, and timbre.
+	 * 
+	 * @param {string} trackID The
+	 * <a href="https://developer.spotify.com/documentation/web-api/#spotify-uris-and-ids">Spotify ID</a> for the
+	 * track.
+	 * @returns {Promise<SpotifyAudioAnalysis>} A Promise that resolves to a low-level audio analysis for a track in the
+	 * Spotify catalog.
+	 */
 	public getTracksAudioAnalysis(trackID: string): Promise<SpotifyAudioAnalysis> {
 		
 		return this.query("GET", `/audio-analysis/${trackID}`);
 		
 	}
 	
+	/**
+	 * Recommendations are generated based on the available information for a given seed entity and matched against
+	 * similar artists and tracks. If there is sufficient information about the provided seeds, a list of tracks will be
+	 * returned together with pool size details.
+	 *
+	 * For artists and tracks that are very new or obscure there might not be enough data to generate a list of tracks.
+	 * 
+	 * @param {MarketSpecifier & LimitSpecifier & RecommendationsSpecifier} options Optional parameters for this
+	 * endpoint. See the documentation for the individual parameter types for more information.
+	 * @returns {Promise<SpotifyRecommendations>} A Promise that resolves to a list of tracks, together with pool size
+	 * details.
+	 */
 	public getRecommendations(options: MarketSpecifier & LimitSpecifier & RecommendationsSpecifier = {}):
 		Promise<SpotifyRecommendations> {
 		
@@ -578,6 +705,14 @@ export class SpotifyAPI {
 	
 	// ===== SEARCH ENDPOINTS =====
 	
+	/**
+	 * Get Spotify catalog information about albums, artists, playlists, tracks, shows or episodes that match a keyword
+	 * string.
+	 * 
+	 * @param {MarketSpecifier & PaginationSpecifier & SearchSpecifier} options Optional parameters for this endpoint.
+	 * See the documentation for the individual parameter types for more information.
+	 * @returns {Promise<SpotifySearchResults>}
+	 */
 	public searchForItem(options: MarketSpecifier & PaginationSpecifier & SearchSpecifier = {}):
 		Promise<SpotifySearchResults> {
 		
@@ -593,8 +728,27 @@ export class SpotifyAPI {
 	
 	// ===== GENRE ENDPOINTS =====
 	
+	/**
+	 * Retrieve a list of available genres seed parameter values for
+	 * <a href="https://developer.spotify.com/documentation/web-api/reference/#/operations/get-recommendations">
+	 * recommendations</a>.
+	 * 
+	 * @returns {Promise<SpotifySingleKeyObject<"genres", string[]>>} A Promise that resolves to a list of available
+	 * genres seed parameter values.
+	 */
+	public getAvailableGenreSeeds(): Promise<SpotifySingleKeyObject<"genres", string[]>> {
+		
+		return this.query("GET", `/recommendations/available-genre-seeds`);
+		
+	}
+	
 	// ===== PLAYER ENDPOINTS =====
 	
+	/**
+	 * 
+	 * @param {string} deviceID
+	 * @returns {Promise<void>}
+	 */
 	public pausePlayback(deviceID?: string): Promise<void> {
 		
 		return this.query("PUT", `/me/player/pause`, { device_id: deviceID });
@@ -603,6 +757,10 @@ export class SpotifyAPI {
 	
 	// ===== MARKET ENDPOINTS =====
 	
+	/**
+	 * 
+	 * @returns {Promise<SpotifySingleKeyObject<"markets", string[]>>}
+	 */
 	public getAvailableMarkets(): Promise<SpotifySingleKeyObject<"markets", string[]>> {
 		
 		return this.query("GET", `/markets`);
