@@ -20,8 +20,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// import util from "util";
 import { SpotifyAPI } from "./spotify-api";
 import { Credentials, getCredentials } from "./credentials";
+// import { SpotifyShow } from "./schema/spotify-show";
 
 /**
  * NPM main class used for exporting this package's contents.
@@ -33,15 +35,26 @@ import { Credentials, getCredentials } from "./credentials";
 
 // export { ClassName } from "./class-location";
 
-const TUESDAY_TALKS_SHOW_ID: string = "5aEsPtN61qhf1mxTrrcgOt";
+// const TUESDAY_TALKS_SHOW_ID: string = "5aEsPtN61qhf1mxTrrcgOt";
 
 export async function main(): Promise<void> {
 	
 	let credentials: Credentials = await getCredentials();
 	
-	let api: SpotifyAPI = await SpotifyAPI.createWithClientInfo(credentials.clientId, credentials.clientSecret);
+	// let api: SpotifyAPI = await SpotifyAPI.createWithClientInfo(credentials.clientId, credentials.clientSecret);
+	let api: SpotifyAPI = await SpotifyAPI.createWithLogin(
+		credentials.clientId,
+		"https://raptors1711.com/",
+		[ "user-library-modify", "app-remote-control" ]
+	);
 	
-	console.log(JSON.stringify(await api.getShow(TUESDAY_TALKS_SHOW_ID, "US")));
+	api;
+	
+	// await api.pausePlayback();
+	
+	// let result: SpotifyShow = await api.getShow(TUESDAY_TALKS_SHOW_ID, "US");
+	//
+	// console.log(util.inspect(result, false, null, true));
 	
 }
 

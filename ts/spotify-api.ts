@@ -5,6 +5,7 @@
  */
 
 import util from "util";
+import crypto from "crypto";
 import { request, RequestResponse } from "./request";
 import { SpotifyShow } from "./schema/spotify-show";
 import { SpotifyPagination } from "./schema/spotify-pagination";
@@ -25,63 +26,123 @@ import {
 } from "./spotify-specifiers";
 import { SpotifyScope } from "./spotify-scopes";
 
+export type SpotifyAuthorizationInfo = {
+	url: string,
+	callback: (code: string, state?: string) => Promise<SpotifyAPI>
+};
+
 export class SpotifyAPI {
 	
-	public static readonly BASE_API_URL: string = "https://api.spotify.com/";
+	protected static readonly BASE_API_URL: string = "https://api.spotify.com/";
+	
+	protected static readonly BASE_ACCOUNTS_URL: string = "https://api.spotify.com/";
 	
 	protected accessToken: string;
 	
-	public constructor(accessToken: string) {
+	protected refreshToken?: string;
+	
+	protected tokenExpiration?: number;
+	
+	public constructor(accessToken: string);
+	public constructor(accessToken: string, expiresIn: number);
+	public constructor(accessToken: string, expiresIn: number, refreshToken: string);
+	public constructor(accessToken: string, expiresIn?: number, refreshToken?: string) {
 		
 		this.accessToken = accessToken;
+		this.refreshToken = refreshToken;
+		
+		if (expiresIn !== undefined) this.tokenExpiration = Date.now() + expiresIn;
 		
 	}
 	
-	public static async createWithClientInfo(clientID: string, clientSecret: string): Promise<SpotifyAPI> {
+	public static async createWithClientCredentials(clientID: string, clientSecret: string): Promise<SpotifyAPI> {
 		
-		let authHeaderValue: string = Buffer.from(`${clientID}:${clientSecret}`).toString("base64");
-		let formData: URLSearchParams = new URLSearchParams();
-		
-		formData.append("grant_type", "client_credentials");
-		
-		let response: RequestResponse = await request("https://accounts.spotify.com/api/token", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
-				"Authorization": `Basic ${authHeaderValue}`
-			},
-		}, formData.toString());
+		let response: RequestResponse = await this.authorize(clientID, clientSecret, { grant_type: "client_credentials" });
 		
 		if (response.status === 200) return new SpotifyAPI(response.body.access_token);
 		else throw new Error(`Failed to initialize a connection with the Spotify API. Response body: ${response.body}`);
 		
 	}
 	
-	public static async createWithLogin(clientID: string, redirectURI: string, scopes: SpotifyScope[]): Promise<any> {
+	public static createWithAuthorizationCode(clientID: string, clientSecret: string, redirectURI: string,
+													scopes: SpotifyScope[] = []): SpotifyAuthorizationInfo {
 		
-		let authorizationURL: URL = new URL("https://accounts.spotify.com/authorize");
-		let state: string = "rand16charstring";
+		const referenceState: string = crypto.randomBytes(8).toString("hex");
 		
-		authorizationURL.searchParams.append("response_type", "code");
-		authorizationURL.searchParams.append("client_id", clientID);
-		authorizationURL.searchParams.append("scope", scopes.join(" "));
-		authorizationURL.searchParams.append("redirect_uri", redirectURI);
-		authorizationURL.searchParams.append("state", state);
+		let authenticationURL: URL = new URL("/authorize", SpotifyAPI.BASE_ACCOUNTS_URL);
 		
-		console.log(authorizationURL.href);
+		authenticationURL.searchParams.append("response_type", "code");
+		authenticationURL.searchParams.append("client_id", clientID);
+		authenticationURL.searchParams.append("redirect_uri", redirectURI);
+		authenticationURL.searchParams.append("state", referenceState);
+		
+		if (scopes.length > 0) authenticationURL.searchParams.append("scope", scopes.join(" "));
+		
+		const callback: SpotifyAuthorizationInfo["callback"] = async (code: string, state?: string):
+			Promise<SpotifyAPI> => {
+			
+			let response: RequestResponse = await SpotifyAPI.authorize(clientID, clientSecret, {
+				grant_type: "authorization_code",
+				code,
+				redirect_uri: redirectURI
+			});
+			
+			if (response.status === 200) {
+				
+				return new SpotifyAPI(
+					response.body.access_token,
+					response.body.expires_in,
+					response.body.refresh_token
+				);
+				
+			} else {
+				
+				throw new Error(
+					`Failed to initialize a connection with the Spotify API. Response body: ${response.body}`
+				);
+				
+			}
+			
+		};
+		
+		return { url: authenticationURL.href, callback };
 		
 	}
 	
-	protected getAuthorizationHeaderValue(): string {
+	/**
+	 * Performs the final step of the Spotify API authorization process, providing the API with some form of credentials
+	 * in return for an access token and potentially a refresh token, depending on the specific authorization method
+	 * being used.
+	 * 
+	 * @param {string} clientID The Spotify API client ID for the current application.
+	 * @param {string} clientSecret The Spotify API client secret for the current application.
+	 * @param {{[p: string]: string}} data
+	 * @returns {Promise<RequestResponse>}
+	 */
+	protected static async authorize(clientID: string, clientSecret: string, data: { [key: string]: string }):
+		Promise<RequestResponse> {
 		
-		return `Bearer ${this.accessToken}`;
+		return await request("https://accounts.spotify.com/api/token", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				"Authorization": `Basic ${Buffer.from(`${clientID}:${clientSecret}`).toString("base64")}`
+			},
+		}, (new URLSearchParams(data)).toString());
 		
 	}
 	
+	/**
+	 * Returns an object containing the base request headers that are used in every post-authentication request sent to
+	 * the Spotify API.
+	 * 
+	 * @returns {object} An object containing the base request headers that are used in every post-authentication
+	 * request sent to the Spotify API.
+	 */
 	protected getBaseRequestHeaders(): object {
 		
 		return {
-			"Authorization": this.getAuthorizationHeaderValue(),
+			"Authorization": `Bearer ${this.accessToken}`,
 			"Content-Type": "application/json"
 		};
 		
